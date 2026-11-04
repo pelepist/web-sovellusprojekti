@@ -1,0 +1,49 @@
+
+name: Build and deploy movieapp to Azure
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build React frontend
+        run: npm run build
+
+      - name: Install backend dependencies
+        run: npm ci --omit=dev
+        working-directory: api
+
+        - name: Login to Azure
+          uses: azure/login@v2
+          with:
+            client-id: ${{ secrets.MOVIEAPP_AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.MOVIEAPP_AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.MOVIEAPP_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: movieapp
+          slot-name: Production
+          package: .

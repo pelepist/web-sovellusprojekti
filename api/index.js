@@ -1,5 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import cors from 'cors'
 import errorHandler from './middleware/errorHandler.js'
 import testRouter from './routes/testRouter.js'
@@ -32,6 +34,16 @@ app.get('/api/health', async (req, res) => {
       timestamp: new Date().toISOString()
     })
   }
+})
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const distPath = path.join(__dirname, '../dist')
+
+app.use(express.static(distPath))
+
+app.get('/{*path}', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'))
 })
 
 app.use((req, res, next) => {

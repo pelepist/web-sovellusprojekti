@@ -5,14 +5,18 @@ const { Pool } = pkg
 const openDb = () => {
   const pool = new Pool({
     user: process.env.DB_USER,
-    host: process.env.DB_HOST,    
+    host: process.env.DB_HOST,
     database: process.env.DB_NAME,
     password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT
+    port: Number(process.env.DB_PORT || 5432),
+    ssl: process.env.DB_SSL === 'true'
+      ? { rejectUnauthorized: true }
+      : false
   })
+
   return pool
 }
 
-const pool = openDb() 
+const pool = openDb()
 
 export { pool }
