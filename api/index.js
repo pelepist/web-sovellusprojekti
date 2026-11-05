@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import cors from 'cors'
 import errorHandler from './middleware/errorHandler.js'
 import testRouter from './routes/testRouter.js'
+import tmdbRouter from './routes/tmdbRouter.js'
 
 const port = process.env.PORT || 3000
 
@@ -15,6 +16,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.use('/api/test', testRouter)
+app.use('/api/tmdb', tmdbRouter)
 
 // Health check endpoint for database connectivity
 app.get('/api/health', async (req, res) => {
